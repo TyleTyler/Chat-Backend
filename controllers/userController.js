@@ -8,6 +8,7 @@ const createToken = (_id) =>{
 
 
 //*Function that signs up a user
+//?The request body has to have an email, password, and username
 const signup = async function(req, res){
     const {username, email, password}= req.body
     try{
@@ -21,6 +22,7 @@ const signup = async function(req, res){
 }
 
 //*Function that logs in a user
+//?The request body has to have an email and password 
 const login = async function(req, res){
     const {email, password} = req.body
     try{
