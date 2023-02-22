@@ -35,4 +35,15 @@ const login = async function(req, res){
     }
 }
 
-module.exports = {signup , login}   
+//*This general fucntion returns every user in the DB
+//?This does not intake any parameters
+const getAll = async (req, res) => {
+    const users = await User.find()
+    try {
+        res.status(200).json({...users})
+    }catch(error){
+        res.status(400).json({error})
+    }
+}
+
+module.exports = {signup , login, getAll}   
