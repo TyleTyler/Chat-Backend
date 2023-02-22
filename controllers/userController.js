@@ -29,10 +29,10 @@ const login = async function(req, res){
         const login = await User.login(email, password)
         //create a jwt token
         const token =  createToken(login._id)
-        res.status(200).json({email, token})
+        res.status(200).json({...login, token})
     }catch(error){
         res.status(400).json({error: error.message})
     }
 }
 
-module.exports = {signup , login}
+module.exports = {signup , login}   
