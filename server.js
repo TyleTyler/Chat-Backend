@@ -4,12 +4,16 @@ const mongoose = require('mongoose')
 const express = require("express")
 const app = express()
 const userRoutes = require("./routes/userRoutes")
+const cors = require('cors')
 
 
 //*Setting up DB and port connection 
+app.use(cors({
+    origin:"*"
+}))
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-
+app.use(cors)
 mongoose.set('strictQuery', true);
 
 mongoose.connect(process.env.DBURI).then(()=>{
