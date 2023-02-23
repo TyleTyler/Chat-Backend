@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const validator = require('validator')
 
+
+
 const userSchema = mongoose.Schema({
     username: { 
         type: String, 
@@ -15,14 +17,39 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
         unique: true
+    },
+    friendCode: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    friends:{
+        type: Array
     }
 })
+
+const generateFriendCode = () =>  {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    while (result.length < 6) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+
+
 
 
  //*Static signup method
 userSchema.statics.signup = async function(username, email, password){
     //Validation
     const exists = await this.findOne({email})
+    let friendCode = generateFriendCode()
+    let friendCodeExists = await this.findOne({friendCode})
+    while(friendCodeExists){
+        friendCode = generateFriendCode()
+    }
+
     if(exists){
         throw Error("Email already in use")
     }
@@ -37,11 +64,11 @@ userSchema.statics.signup = async function(username, email, password){
     }
 
 
-
+    
     const salt = await bcrypt.genSalt(5)
     const hashedPassword = await bcrypt.hash(password, salt)
 
-    const user = await this.create({username, email, password: hashedPassword})
+    const user = await this.create({username, email, password: hashedPassword, friendCode})
 
     return user;
 
