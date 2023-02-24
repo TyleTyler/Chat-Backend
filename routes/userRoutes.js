@@ -1,5 +1,5 @@
 const express = require('express')
-const { signup, login, getAll } = require('../controllers/userController')
+const { signup, login, getAll, addFriend } = require('../controllers/userController')
 const router = express.Router()
 
 router.get("/", (req, res)=>{
@@ -15,6 +15,8 @@ router.post('/login', (req, res) => login(req,res))
 
 //*Route that returns all the users
 router.get('/allUsers', (req,res) =>getAll(req, res))
+
+router.get('/addFriend:email:friendcode', (req, res)=> addFriend(req, res))
 
 
 
