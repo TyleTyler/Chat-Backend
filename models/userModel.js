@@ -95,6 +95,7 @@ userSchema.statics.login = async function(email, password){
     
 }
 
+<<<<<<< HEAD
 userSchema.statics.addFriend = async function(email, friendCode){
     const exists = await this.findOne({friendCode})
     const user = await this.findOne({email})
@@ -130,5 +131,9 @@ userSchema.statics.acceptReq = async function(email, friendCode){
     }
     return user;
 }
+=======
+
+
+>>>>>>> TrackBranch
 
 module.exports = mongoose.model('User', userSchema)
