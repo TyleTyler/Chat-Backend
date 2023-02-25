@@ -14,10 +14,6 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-<<<<<<< HEAD
-
-=======
->>>>>>> TrackBranch
 mongoose.set('strictQuery', true);
 
 mongoose.connect(process.env.DBURI).then(()=>{

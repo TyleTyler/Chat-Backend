@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const User = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 require("dotenv").config()
@@ -70,5 +69,3 @@ const acceptFriend = async (req, res) =>{
     }
 }
 module.exports = {signup , login, getAll, addFriend, acceptFriend}   
-=======
->>>>>>> TrackBranch
