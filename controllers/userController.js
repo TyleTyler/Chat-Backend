@@ -15,7 +15,7 @@ const signup = async function(req, res){
         const signup = await User.signup(username, email, password)
         //create a jwt token
         const token =  createToken(signup._id)
-        res.status(200).json({...signup, token})
+        res.status(200).json({email, token})
     }catch(error){
         res.status(400).json({error: error.message})
     }
@@ -38,12 +38,34 @@ const login = async function(req, res){
 //*This general fucntion returns every user in the DB
 //?This does not intake any parameters
 const getAll = async (req, res) => {
-    const users = await User.find()
     try {
+        const users = await User.find()
         res.status(200).json({...users})
     }catch(error){
-        res.status(400).json({error})
+        res.status(400).json({error : error.message})
     }
 }
 
-module.exports = {signup , login, getAll}   
+
+//*This function is used to add a friend
+//?The request body should have the recipeient's email and a friend code
+const addFriend = async (req, res) => {
+    const {email, friendcode} = req.params
+    try {
+        const friendReq = await User.addFriend(email, friendcode)
+        res.status(200).json({...friendReq})
+    }catch(error){
+        res.status(400).json({error : error.message})
+    }
+} 
+
+const acceptFriend = async (req, res) =>{
+    const {email, friendcode} = req.params
+    try {
+        const friendReq = await User.acceptReq(email, friendcode)
+        res.status(200).json({...friendReq})
+    }catch(error){
+        res.status(400).json({error : error.message})
+    }
+}
+module.exports = {signup , login, getAll, addFriend, acceptFriend}   
