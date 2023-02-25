@@ -25,6 +25,9 @@ const userSchema = mongoose.Schema({
     },
     friends:{
         type: Array
+    },
+    friendRequest:{
+        type: Array
     }
 })
 
@@ -94,5 +97,41 @@ userSchema.statics.login = async function(email, password){
 git
 
 
+
+userSchema.statics.addFriend = async function(email, friendCode){
+    const exists = await this.findOne({friendCode})
+    const user = await this.findOne({email})
+    if(!exists){
+        throw new Error("Invalid Friend Code")
+    }
+    if(exists.email == email){
+        throw new Error("You cannot friend yourself")
+    }
+    const friendReq = await this.updateOne(
+            {friendCode},
+            {$addToSet : {friendRequest: user}}
+    )
+    
+    return friendReq;
+}
+
+userSchema.statics.acceptReq = async function(email, friendCode){
+    const user = await this.findOne({email})
+    const friend = await this.findOne({friendCode})
+     try { 
+        await this.updateOne(
+            {email},
+            {$addToSet : {friends: friend }},
+            {$pull: {friendRequest : friend}} 
+        )
+        await this.updateOne(
+            {friendCode},
+            {$addToSet : {friends: user }},
+        )
+    }catch(error){
+        throw new Error("Could not add friend")
+    }
+    return user;
+}
 
 module.exports = mongoose.model('User', userSchema)
