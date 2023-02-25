@@ -1,5 +1,6 @@
 require("dotenv").config()
 
+
 const mongoose = require('mongoose')
 const express = require("express")
 const app = express()
@@ -13,6 +14,7 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
+
 mongoose.set('strictQuery', true);
 
 mongoose.connect(process.env.DBURI).then(()=>{
