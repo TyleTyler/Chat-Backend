@@ -11,7 +11,9 @@ const cors = require('cors')
 //*Setting up DB and port connection 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-app.use(cors)
+app.use(cors({
+    origin: "*"
+}))
 mongoose.set('strictQuery', true);
 
 mongoose.connect(process.env.DBURI).then(()=>{

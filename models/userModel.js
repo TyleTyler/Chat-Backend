@@ -114,22 +114,25 @@ userSchema.statics.addFriend = async function(email, friendCode){
     return friendReq;
 }
 
-userSchema.statics.acceptReq = async function(email, friendCode){
+userSchema.statics.acceptReq = async function(email, friendID){
+
     const user = await this.findOne({email})
-    const friend = await this.findOne({friendCode})
+    const friend = await this.findById(friendID)
+    console.log(user);
+    console.log("______________");
+    console.log(friend);
+    console.log("________________");
      try { 
+        await this.findOneAndUpdate({email}, {$pull:{friendRequest:{_id: friendID}}},{multi:true} )
         await this.updateOne(
             {email},
-            {$addToSet : {friends: friend }},
-            {$pull: {friendRequest : friend}} 
-        )
-        await this.updateOne(
-            {friendCode},
-            {$addToSet : {friends: user }},
-        )
-    }catch(error){
-        throw new Error("Could not add friend")
-    }
+            {$addToSet : {friends: friend}},
+        );
+        await this.findByIdAndUpdate(friendID,{$addToSet : {friends: user}}
+        );
+        }catch(error){
+            throw new Error(error)
+        }
     return user;
 }
 
