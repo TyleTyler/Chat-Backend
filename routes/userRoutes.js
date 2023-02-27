@@ -22,6 +22,6 @@ router.get('/addFriend:email:friendcode', (req, res)=> addFriend(req, res))
 router.get('/sendRequest/:email/:friendcode', (req, res)=>sendFriendRequest(req, res))
 
 //*Route that accepts a friend request
-router.get('/acceptFriend/:email/:friendID', (req, res)=>acceptFriend(req, res))
+router.get('/acceptFriend/:userID/:friendID', (req, res)=>acceptFriend(req, res))
 
 module.exports = router

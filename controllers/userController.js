@@ -62,9 +62,9 @@ const sendFriendRequest = async (req, res)=>{
 //*This functions accepts a friend request
 //?The request must contain an email and a friendsmail
 const acceptFriend = async (req, res)=>{
-    const {email, friendID} = req.params
+    const {userID, friendID} = req.params
     try{
-        const status = await User.acceptReq(email, friendID)
+        const status = await User.acceptReq(userID, friendID)
         res.status(200).json({...status})
     }catch({message}){
         res.status(400).json({message})
