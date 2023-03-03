@@ -96,7 +96,7 @@ userSchema.statics.login = async function(email, password){
 }
 
 
-
+//*Static add method
 userSchema.statics.addFriend = async function(email, friendCode){
     const exists = await this.findOne({friendCode})
     const user = await this.findOne({email})
@@ -106,37 +106,62 @@ userSchema.statics.addFriend = async function(email, friendCode){
     if(exists.email == email){
         throw new Error("You cannot friend yourself")
     }
+    for(friend of user.friends){
+        if(friend.friendCode == friendCode){
+            throw new Error("You already have this person friended")
+        }
+    }
+    for(request of exists.friendRequest){
+        console.log(request)
+        if(request.email == email){
+            throw new Error("You already sent this person a friend request")
+        }
+    }
     const friendReq = await this.updateOne(
             {friendCode},
             {$addToSet : {friendRequest: user}}
     )
     
-    return friendReq;
-}
-
-userSchema.statics.acceptReq = async function(UserID, friendID){
-
-    const user = await this.findById(UserID)
-    const friend = await this.findById(friendID)
-    console.log(user);
-    console.log("______________");
-    console.log(friend);
-    console.log("________________");
-     try { 
-        await this.findByIdAndUpdate(UserID, {$pull:{"friendRequest":{_id: friendID}}},{multi:true}, function(err, data){
-            console.log(err, data);
-          });
-        // await this.updateOne(
-        //     {email},
-        //     {$addToSet : {friends: friend}},
-        // );
-        // await this.findByIdAndUpdate(friendID,{$addToSet : {friends: user}}
-        // );
-        await user.save()
-        }catch(error){
-            throw new Error(error)
-        }
     return user;
 }
 
+
+//*Static Accept Friend Method
+userSchema.statics.acceptReq = async function(userID, friendID){
+
+    const user = await this.findById(userID)
+    const friend = await this.findById(friendID)
+    try {
+        await this.findById(userID).then( user=>{
+            user.friendRequest = user.friendRequest.filter(friend => friend._id != friendID)
+            user.save()
+        })
+        await this.findByIdAndUpdate(userID,{$addToSet : {friends: friend}});
+        await this.findByIdAndUpdate(friendID,{$addToSet : {friends: user}});
+    }catch(error){
+        throw new Error(error)
+    }
+    return user
+}
+
+
+//*Static Remove Friend method
+userSchema.statics.removeFriend = async function(userID, friendID){
+    const user = await this.findById(userID)
+    for(friend of user.friends){
+        if(friend._id == friendID){
+            await this.findById(userID).then(user =>{
+                user.friends = user.friends.filter(friend => friend._id != friendID)
+                user.save()
+            })
+            await this.findById(friendID).then(user =>{
+                user.friends = user.friends.filter(friend => friend._id != userID)
+                user.save()
+            })
+
+            return user;
+        }
+    }
+    throw new Error("You don't have this friend")
+}
 module.exports = mongoose.model('User', userSchema)

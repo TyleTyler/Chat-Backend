@@ -1,5 +1,5 @@
 const express = require('express')
-const { signup, login, getAll, sendFriendRequest, acceptFriend } = require('../controllers/userController')
+const { signup, login, getAll, sendFriendRequest, acceptFriend, removeFriend } = require('../controllers/userController')
 const router = express.Router()
 
 router.get("/", (req, res)=>{
@@ -23,5 +23,8 @@ router.get('/sendRequest/:email/:friendcode', (req, res)=>sendFriendRequest(req,
 
 //*Route that accepts a friend request
 router.get('/acceptFriend/:userID/:friendID', (req, res)=>acceptFriend(req, res))
+
+//*Route that remove a friend
+router.delete('/removeFriend/:userID/:friendID', (req, res)=> removeFriend(req, res))
 
 module.exports = router
