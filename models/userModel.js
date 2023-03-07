@@ -164,4 +164,25 @@ userSchema.statics.removeFriend = async function(userID, friendID){
     }
     throw new Error("You don't have this friend")
 }
+
+//*Static Reject Friend Request method
+userSchema.statics.rejectReq = async function(userID, friendID){
+    const user = await this.findById(userID)
+    for(friend of user.friends){
+        if(friend._id == friendID){
+            await this.findById(userID).then(user =>{
+                user.friends = user.friendRequest.filter(friend => friend._id != friendID)
+                user.save()
+            })
+            await this.findById(friendID).then(user =>{
+                user.friends = user.friendRequest.filter(friend => friend._id != userID)
+                user.save()
+            })
+
+            return user;
+        }
+    }
+    throw new Error("You don't have this friend")
+}
+
 module.exports = mongoose.model('User', userSchema)

@@ -15,7 +15,7 @@ const signup = async function(req, res){
         const signup = await User.signup(username, email, password)
         //create a jwt token
         const token =  createToken(signup._id)
-        res.status(200).json({email, token})
+        res.status(200).json({...signup, token})
     }catch(error){
         res.status(400).json({error: error.message})
     }
@@ -62,11 +62,11 @@ const sendFriendRequest = async (req, res)=>{
 
 //*This functions accepts a friend request
 //?The request must contain both ID's of recipeient and the sender
-const acceptFriend = async (req, res)=>{
+const acceptRequest = async (req, res)=>{
     const {userID, friendID} = req.params
     try{
         const status = await User.acceptReq(userID, friendID)
-        res.status(200).json({...status})
+        res.status(200).json({message: "Accepted Friend!"})
     }catch({message}){
         res.status(400).json({message})
     }
@@ -84,4 +84,31 @@ const removeFriend = async (req, res)=>{
         res.status(400).json({message})
     }
 }
-module.exports = {signup , login, getAll, sendFriendRequest, acceptFriend, removeFriend}  
+
+
+//*This Function returns a user
+//?The request parameter must cotain a valid userID
+const getUser = async (req, res)=>{
+    const {userID} = req.params
+    try{
+        const user = await User.findById(userID)
+        res.status(200).json({...user})
+    }catch({message}){
+        res.status(400).json({message})
+    }
+}
+
+//*THis function rejects a friend request
+//?The request must contain both ID's of recipeient and the sender
+const rejectRequest = async (req, res)=>{
+    const {userID, friendID} = req.params
+    try{
+        const status = await User.rejectReq(userID, friendID)
+        res.status(200).json({message : "Rejected Request"})
+    }catch({message}){
+        res.status(400).json({message})
+    }
+}
+
+
+module.exports = {signup , login, getAll, sendFriendRequest, acceptRequest, rejectRequest, removeFriend, getUser}  
