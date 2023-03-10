@@ -22,4 +22,6 @@ mongoose.connect(process.env.DBURI).then(()=>{
     })
 })
 
+
+
 app.use("/chatAPI/user/", userRoutes )

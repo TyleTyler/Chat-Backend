@@ -1,10 +1,12 @@
 const express = require('express')
 const { signup, login, getAll, sendFriendRequest, acceptRequest, removeFriend, getUser, rejectRequest } = require('../controllers/userController')
 const router = express.Router()
+const requireAuth = require("../middleWar/useAuth")
 
 router.get("/", (req, res)=>{
     res.json( {body : "Recieved"})
 })
+
 
 
 //*Signup Route
@@ -14,10 +16,14 @@ router.post('/signup', (req,res) => signup(req, res))
 router.post('/login', (req, res) => login(req,res))
 
 //*Route that returns all the users
-router.get('/allUsers', (req,res) =>getAll(req, res))
 
 //*Route that returns a user
 router.get("/getUser/:userID", (req, res) => getUser(req, res))
+
+
+//*User Authtentication
+router.use(requireAuth)
+router.get('/allUsers', (req,res) =>getAll(req, res))
 
 router.get('/addFriend:email:friendcode', (req, res)=> addFriend(req, res))
 
