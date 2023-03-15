@@ -29,7 +29,7 @@ const login = async function(req, res){
         const login = await User.login(email, password)
         //create a jwt token
         const token =  createToken(login._id)
-        res.status(200).json({...login, token})
+        res.status(200).json({...login, token : token})
     }catch(error){
         res.status(400).json({error: error.message})
     }

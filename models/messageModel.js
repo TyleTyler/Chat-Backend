@@ -24,7 +24,7 @@ const messageSchema = mongoose.Schema({
         timestamps: true   
     })
 
-    chatSchema.statics.sendMessage = async function(senderID, content, chatID){
+    messageSchema.statics.sendMessage = async function(senderID, content, chatID){
         const sender = await this.findById(senderID)
         const chat = await this.findById(chatID)
         if(content === ""){

@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const express = require("express")
 const app = express()
 const userRoutes = require("./routes/userRoutes")
+const chatRoutes = require("./routes/chatRoutes")
 const cors = require('cors')
 
 
@@ -24,4 +25,5 @@ mongoose.connect(process.env.DBURI).then(()=>{
 
 
 
-app.use("/chatAPI/user/", userRoutes )
+app.use("/chatAPI/user/", userRoutes)
+app.use("/chatAPI/chat/", chatRoutes)
