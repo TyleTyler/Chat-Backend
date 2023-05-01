@@ -23,12 +23,14 @@ const userSchema = mongoose.Schema({
         required: true,
         unique: true,
     },
-    friends:{
-        type: Array
-    },
-    friendRequest:{
-        type: Array
-    }
+    friends:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User" 
+    }],
+    friendRequest:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }]
 })
 
 const generateFriendCode = () =>  {
@@ -83,7 +85,7 @@ userSchema.statics.login = async function(email, password){
     if(!email || !password){
         throw new Error("All fields should be filled")
     }
-    const user = await this.findOne({email})
+    const user = await this.findOne({email}).populate("friends", "-password").populate("friendRequest", "-password")
     if(!user){
         throw Error("Incorrect email")
     }
@@ -112,14 +114,13 @@ userSchema.statics.addFriend = async function(email, friendCode){
         }
     }
     for(request of exists.friendRequest){
-        console.log(request)
         if(request.email == email){
             throw new Error("You already sent this person a friend request")
         }
     }
     const friendReq = await this.updateOne(
             {friendCode},
-            {$addToSet : {friendRequest: user}}
+            {$addToSet : {friendRequest: user._id}}
     )
     
     return user;
@@ -133,11 +134,11 @@ userSchema.statics.acceptReq = async function(userID, friendID){
     const friend = await this.findById(friendID)
     try {
         await this.findById(userID).then( user=>{
-            user.friendRequest = user.friendRequest.filter(friend => friend._id != friendID)
+            user.friendRequest = user.friendRequest.filter(friend => friend != friendID)
             user.save()
         })
-        await this.findByIdAndUpdate(userID,{$addToSet : {friends: friend}});
-        await this.findByIdAndUpdate(friendID,{$addToSet : {friends: user}});
+        await this.findByIdAndUpdate(userID,{$addToSet : {friends: friendID}});
+        await this.findByIdAndUpdate(friendID,{$addToSet : {friends: userID}});
     }catch(error){
         throw new Error(error)
     }
@@ -151,11 +152,11 @@ userSchema.statics.removeFriend = async function(userID, friendID){
     for(friend of user.friends){
         if(friend._id == friendID){
             await this.findById(userID).then(user =>{
-                user.friends = user.friends.filter(friend => friend._id != friendID)
+                user.friends = user.friends.filter(friend => friend != friendID)
                 user.save()
             })
             await this.findById(friendID).then(user =>{
-                user.friends = user.friends.filter(friend => friend._id != userID)
+                user.friends = user.friends.filter(friend => friend != userID)
                 user.save()
             })
 
@@ -171,11 +172,11 @@ userSchema.statics.rejectReq = async function(userID, friendID){
     for(friend of user.friends){
         if(friend._id == friendID){
             await this.findById(userID).then(user =>{
-                user.friends = user.friendRequest.filter(friend => friend._id != friendID)
+                user.friends = user.friendRequest.filter(friend => friend != friendID)
                 user.save()
             })
             await this.findById(friendID).then(user =>{
-                user.friends = user.friendRequest.filter(friend => friend._id != userID)
+                user.friends = user.friendRequest.filter(friend => friend != userID)
                 user.save()
             })
 
@@ -184,5 +185,22 @@ userSchema.statics.rejectReq = async function(userID, friendID){
     }
     throw new Error("You don't have this friend")
 }
+
+userSchema.statics.searchUsers = async function(searchConditions, userID){
+    try{
+        const searchTerm = searchConditions ? {
+            $or:[
+                {username: new RegExp(searchConditions, 'i')}, 
+                {email: new RegExp(searchConditions, 'i')},
+                {friendCode: new RegExp(searchConditions, 'i')},
+            ],
+        } : {}
+        const possibleUsers = await this.find(searchTerm).find({_id: {$ne: userID}})
+        return possibleUsers;
+    }catch(error){
+        throw new Error(error)
+    }
+}
+
 
 module.exports = mongoose.model('User', userSchema)

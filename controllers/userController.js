@@ -41,7 +41,7 @@ const getAll = async (req, res) => {
     const users = await User.find()
     try {
         res.status(200).json({...users})
-    }catch(error){
+    }catch(error){s
         res.status(400).json({error})
     }
 }
@@ -91,8 +91,9 @@ const removeFriend = async (req, res)=>{
 const getUser = async (req, res)=>{
     const {userID} = req.params
     try{
-        const user = await User.findById(userID)
-        res.status(200).json({...user})
+        const user = await User.findById(userID).populate("friends", "-password").populate("friendRequest", "-password")
+        const {_doc} = user
+        res.status(200).json({..._doc})
     }catch({message}){
         res.status(400).json({message})
     }
@@ -110,5 +111,17 @@ const rejectRequest = async (req, res)=>{
     }
 }
 
+//*THis function returns possible users on the DB given a search condition
+//?This request must contain both the UserID to be excluded and a search condition
+const getUsers = async (req, res) => {
+  const {searchTerm, userID} = req.body
+  try{
+    const users = await User.searchUsers(searchTerm, userID)
+    res.status(200).json({...users})
+  }catch({message}){
+    res.status(400).json({message})
+  }
+}
 
-module.exports = {signup , login, getAll, sendFriendRequest, acceptRequest, rejectRequest, removeFriend, getUser}  
+
+module.exports = {signup , login, getAll, sendFriendRequest, acceptRequest, rejectRequest, removeFriend, getUser,getUsers }  

@@ -1,16 +1,25 @@
-const Chat = require("../models/chatModel")
+const Message = require("../models/userModel")
 
-
-//*This route returns the chats between two people or creates one if it doesn't already exist
-//?This route requires a userID and a friendID in the body
-const accessChats = async (req, res)=>{
-    const {userID, friendID} = req.body
+const sendMessage = async (req, res)=>{
+    const {senderID, content, chatID} = req.body
     try{
-        const accessedChat = await Chat.accessChats(userID, friendID)
-        res.status(200).json({...accessedChat})
+        const newMessage = await Message.sendMessage(senderID, content, chatID)
+        res.status(200).json({...newMessage})
     }catch({message}){
-        res.status(400).json({message})
+        res.status(400).json({...message})
     }
 }
 
-module.exports= { accessChats}
+const getChatMessages = async(req, res) =>{
+    const {chatID} = req.params
+    try{
+        const chatMessages = await Message.getchatMessages(chatID)
+        res.status(200).json({...chatMessages})
+    }catch({message}){
+        res.status(400).json({...message})
+    }
+}
+
+
+
+module.exports = {sendMessage, getChatMessages}
