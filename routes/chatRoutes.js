@@ -5,7 +5,7 @@ const {accessChats, fetchChats, creatGroupChat, renameChat, addUser} = require("
 
 router.post("/", (req, res)=> accessChats(req, res))
 
-router.get("/", (req, res)=> fetchChats(req, res))
+router.post("/getChats", (req, res)=> fetchChats(req, res))
 
 router.post("/createGC", (req, res)=>creatGroupChat(req, res))
 

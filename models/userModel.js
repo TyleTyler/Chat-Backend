@@ -169,21 +169,21 @@ userSchema.statics.removeFriend = async function(userID, friendID){
 //*Static Reject Friend Request method
 userSchema.statics.rejectReq = async function(userID, friendID){
     const user = await this.findById(userID)
-    for(friend of user.friends){
+    for(friend of user.friendRequest){
         if(friend._id == friendID){
             await this.findById(userID).then(user =>{
-                user.friends = user.friendRequest.filter(friend => friend != friendID)
+                user.friendRequest = user.friendRequest.filter(friend => friend != friendID)
                 user.save()
             })
             await this.findById(friendID).then(user =>{
-                user.friends = user.friendRequest.filter(friend => friend != userID)
+                user.friendRequest = user.friendRequest.filter(friend => friend != userID)
                 user.save()
             })
 
             return user;
         }
     }
-    throw new Error("You don't have this friend")
+    throw new Error("This friend request does not exist")
 }
 
 userSchema.statics.searchUsers = async function(searchConditions, userID){
@@ -192,7 +192,6 @@ userSchema.statics.searchUsers = async function(searchConditions, userID){
             $or:[
                 {username: new RegExp(searchConditions, 'i')}, 
                 {email: new RegExp(searchConditions, 'i')},
-                {friendCode: new RegExp(searchConditions, 'i')},
             ],
         } : {}
         const possibleUsers = await this.find(searchTerm).find({_id: {$ne: userID}})

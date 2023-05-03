@@ -14,9 +14,9 @@ const accessChats = async (req, res)=>{
 }
 
 const fetchChats = async (req, res)=>{
-   const {userID, friendID} = req.body
+   const {userID} = req.body
     try{
-        const fetchedChat = await Chat.fetchChats(userID, friendID)
+        const fetchedChat = await Chat.fetchChats(userID)
         res.status(200).json({...fetchedChat})
     }catch({message}){
         res.status(400).json({message})
@@ -24,12 +24,10 @@ const fetchChats = async (req, res)=>{
 }
 
 const creatGroupChat = async (req, res)=>{
-    const {users, chatname} = req.body
-    // users = JSON.parse(users)
+    const {users, chatName} = req.body
     try{
-        const groupChat = await Chat.createGroupChat(users, chatname)
-        const {_doc } = groupChat
-        res.status(200).json({..._doc})
+        const groupChat = await Chat.createGroupChat(users, chatName)
+        res.status(200).json({...groupChat})
     }catch({message}){
         res.status(400).json({message})
     }
