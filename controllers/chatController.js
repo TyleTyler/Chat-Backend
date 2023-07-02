@@ -25,6 +25,7 @@ const fetchChats = async (req, res)=>{
 
 const creatGroupChat = async (req, res)=>{
     const {users, chatName} = req.body
+    console.log(req.body)
     try{
         const groupChat = await Chat.createGroupChat(users, chatName)
         res.status(200).json({...groupChat})

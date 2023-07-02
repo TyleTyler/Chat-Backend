@@ -29,6 +29,7 @@ const chatSchema = mongoose.Schema({
     })
 
     chatSchema.statics.accessChats = async function(userID, friendID){
+        const friend = await User.findById(friendID)
         if(!userID){
             throw new Error("UserID required but not found")
         }
@@ -49,7 +50,7 @@ const chatSchema = mongoose.Schema({
             return isChat[0]
         }else{
             const newChat = {
-                chatName: "sender",
+                chatName: friend.username,
                 isGroupChat: false,
                 users: [userID, friendID],
             }
